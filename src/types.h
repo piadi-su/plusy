@@ -2,9 +2,12 @@
 #define TYPES_H
 
 // constants 
-#define SONG_FILE ".playlist_path.txt"
-#define MAX_SONGS 1000
 #define VERSION 1.0
+
+#define MAX_SONGS 1000
+
+#define CONFIG_FILE_NAME ".playlist_path.conf"
+#define MAX_PATH_LEN 1024
 
 
 // all structs

@@ -10,6 +10,7 @@
 
 // my files
 #include "song_func.h"
+#include "setup_func.h"
 #include "types.h"
 
 
@@ -130,7 +131,7 @@ current_song(mpv_handle *mpvClient)
 bool 
 load_playlist_path(char *playlist_path, size_t size)
 {
-	FILE *file_path = fopen(SONG_FILE, "r");
+	FILE *file_path = fopen(full_file_path(), "r");
 	if(file_path == NULL)
 	{
         perror("fopen");

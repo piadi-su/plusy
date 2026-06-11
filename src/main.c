@@ -6,6 +6,7 @@
 #include <mpv/client.h>
 #include <sys/select.h>
 #include <ncurses.h>
+#include <locale.h>
 
 // my files
 #include "setup_func.h"
@@ -19,6 +20,11 @@
 
 // ----main----
 int main(int argc , char *argv[]){
+	
+	setlocale(LC_ALL, "");
+    setlocale(LC_NUMERIC, "C");
+
+	int ret_c = 0;
 
 	char path[512];
 	char choice;
@@ -77,7 +83,8 @@ int main(int argc , char *argv[]){
 	if(mpvClient == NULL)
 	{
 		fprintf(stderr, "cannot create mpv context\n");
-		return 1;
+		ret_c = 1;
+		goto cleanup;
 	}
 
 	//no video output
@@ -86,7 +93,8 @@ int main(int argc , char *argv[]){
 	//inizialize mpv client
 	if (mpv_initialize(mpvClient) < 0) {
 		fprintf(stderr, "cannot initialize mpv\n");
-		return 1;
+		ret_c = 1;
+		goto cleanup;
 	}
 	
 	
@@ -94,7 +102,8 @@ int main(int argc , char *argv[]){
 	{
 	
 		fprintf(stderr, "can't open playlist path\n");
-		return 1;
+		ret_c = 1;
+		goto cleanup;
 			
 	}
 
@@ -105,7 +114,8 @@ int main(int argc , char *argv[]){
 	if (playList.song_count == 0)
 	{
 		fprintf(stderr, "No songs found\n");
-		return 1;
+		ret_c = 1;
+		goto cleanup;
 	}
 
 	const char *cmd[] = {
@@ -164,13 +174,7 @@ int main(int argc , char *argv[]){
 			switch(choice)
 			{
 				case 'q':
-					if(currentSong)
-						mpv_free(currentSong);
-
-					free_playlist(&playList);
-					mpv_terminate_destroy(mpvClient);
-					tui_shutdown();
-					return 0;
+					goto cleanup;
 
 				case 'p':
 					pause_continue(mpvClient);
@@ -216,7 +220,18 @@ int main(int argc , char *argv[]){
 		}
 	}		
 	
+	
+	cleanup:
+		if (currentSong)
+			mpv_free(currentSong);
 
+		free_playlist(&playList);
 
-	return 0;
+		if (mpvClient)
+			mpv_terminate_destroy(mpvClient);
+
+		tui_shutdown();
+
+		return ret_c;
+
 }
